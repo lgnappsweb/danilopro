@@ -1,0 +1,22 @@
+{
+  "placeholderImages": [
+    {
+      "id": "brand-logo",
+      "description": "Logotipo DaniloPro Instalações e Montagens",
+      "imageUrl": "/logo.png",
+      "imageHint": "brand logo"
+    },
+    {
+      "id": "service-bg",
+      "description": "Professional toolset on dark background",
+      "imageUrl": "https://images.unsplash.com/photo-1631561381316-570336556ab4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0b29scyUyMGhhcmR3YXJlfGVufDB8fHx8MTc3MjE4MTEyMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tools hardware"
+    },
+    {
+      "id": "avatar-user",
+      "description": "Professional avatar",
+      "imageUrl": "https://images.unsplash.com/photo-1592878995758-02b32ddabdd3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxidXNpbmVzc21hbiUyMGF2YXRhcnxlbnwwfHx8fDE3NzIyMzQwNDh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "businessman avatar"
+    }
+  ]
+}

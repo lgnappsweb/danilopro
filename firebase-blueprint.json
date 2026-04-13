@@ -1,0 +1,983 @@
+
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents the administrator's profile information, excluding authentication credentials, for system access and personalization.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity. This typically corresponds to the Firebase Authentication UID."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address associated with the user profile, used for display and communication, not for authentication.",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name of the administrator."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Personal contact phone number."
+        },
+        "personalEmail": {
+          "type": "string",
+          "format": "email"
+        },
+        "personalStreet": { "type": "string" },
+        "personalNumber": { "type": "string" },
+        "personalNeighborhood": { "type": "string" },
+        "personalCity": { "type": "string" },
+        "personalAddress": { "type": "string" },
+        "businessName": {
+          "type": "string",
+          "description": "The name of the user's business."
+        },
+        "businessDocument": {
+          "type": "string",
+          "description": "CNPJ or CPF of the business."
+        },
+        "businessAddress": {
+          "type": "string",
+          "description": "Physical address of the business."
+        },
+        "businessPhone": {
+          "type": "string",
+          "description": "Business contact phone number."
+        },
+        "businessEmail": { "type": "string", "format": "email" },
+        "businessStreet": { "type": "string" },
+        "businessNumber": { "type": "string" },
+        "businessNeighborhood": { "type": "string" },
+        "businessCity": { "type": "string" },
+        "role": {
+          "type": "string",
+          "description": "The role of the user within the application, e.g., 'admin'."
+        },
+        "theme": {
+          "type": "string",
+          "description": "Preferred UI theme (light or dark).",
+          "enum": ["light", "dark"]
+        },
+        "primaryColor": {
+          "type": "string",
+          "description": "Hex code for the primary theme color."
+        },
+        "backgroundColor": {
+          "type": "string",
+          "description": "Hex code for the application background color."
+        },
+        "customAppName": {
+          "type": "string",
+          "description": "Custom name for the application."
+        },
+        "customAppLogoUrl": {
+          "type": "string",
+          "description": "URL or Data URI for the application logo."
+        },
+        "loginPageLogoUrl": {
+          "type": "string",
+          "description": "URL or Data URI for the login page logo."
+        },
+        "customWelcomeBgUrl": {
+          "type": "string",
+          "description": "URL or Data URI for the welcome page background image."
+        },
+        "welcomeTitle": {
+          "type": "string",
+          "description": "Title displayed on the welcome page."
+        },
+        "welcomeSubtitle": {
+          "type": "string",
+          "description": "Subtitle displayed on the welcome page."
+        },
+        "welcomeButtonText": {
+          "type": "string",
+          "description": "Text for the action button on the welcome page."
+        },
+        "welcomeFooterText": {
+          "type": "string",
+          "description": "Text displayed in the footer of the welcome page."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "name",
+        "role",
+        "createdAt"
+      ]
+    },
+    "Client": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Client",
+      "type": "object",
+      "description": "Stores information about individual customers with whom services are provided.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Client entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name or business name of the client."
+        },
+        "phone": {
+          "type": "string",
+          "description": "The primary contact phone number for the client."
+        },
+        "whatsapp": {
+          "type": "string",
+          "description": "The WhatsApp contact number for the client, if different from the primary phone."
+        },
+        "address": {
+          "type": "string",
+          "description": "The physical address of the client."
+        },
+        "documentNumber": {
+          "type": "string",
+          "description": "The CPF (for individuals) or CNPJ (for businesses) document number of the client."
+        },
+        "observations": {
+          "type": "string",
+          "description": "General observations or notes about the client."
+        },
+        "totalSpent": {
+          "type": "number",
+          "description": "The total monetary value of services purchased by this client. This is typically a derived value for quick access."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the client record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the client record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "phone",
+        "createdAt"
+      ]
+    },
+    "Invoice": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Invoice",
+      "type": "object",
+      "description": "Represents an invoice or professional receipt for tax and billing purposes.",
+      "properties": {
+        "id": { "type": "string" },
+        "clientId": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "issueDate": { "type": "string", "format": "date-time" },
+        "invoiceNumber": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "quantity": { "type": "number" },
+              "unitValue": { "type": "number" },
+              "totalValue": { "type": "number" }
+            }
+          }
+        },
+        "subtotal": { "type": "number" },
+        "taxes": {
+          "type": "object",
+          "properties": {
+            "iss": { "type": "number" },
+            "pis": { "type": "number" },
+            "cofins": { "type": "number" },
+            "csll": { "type": "number" },
+            "irrf": { "type": "number" }
+          }
+        },
+        "totalTaxes": { "type": "number" },
+        "discount": { "type": "number" },
+        "finalTotal": { "type": "number" },
+        "status": { "type": "string", "enum": ["Rascunho", "Emitida", "Cancelada"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Supplier": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Supplier",
+      "type": "object",
+      "description": "Holds details about suppliers from whom materials or services are acquired.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Supplier entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the supplier or supplier company."
+        },
+        "phone": {
+          "type": "string",
+          "description": "The primary contact phone number for the supplier."
+        },
+        "email": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of goods or services provided by the supplier (e.g., 'Eletrônicos', 'Ferragens')."
+        },
+        "address": {
+          "type": "string"
+        },
+        "documentNumber": {
+          "type": "string"
+        },
+        "contactPerson": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string"
+        },
+        "paymentTerms": {
+          "type": "string"
+        },
+        "deliveryHours": {
+          "type": "string"
+        },
+        "creditLimit": {
+          "type": "number"
+        },
+        "rating": {
+          "type": "string"
+        },
+        "observations": {
+          "type": "string",
+          "description": "General observations or notes about the supplier."
+        },
+        "totalPurchased": {
+          "type": "number",
+          "description": "The total monetary value of goods or services purchased from this supplier. This is typically a derived value for quick access."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the supplier record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the supplier record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "createdAt"
+      ]
+    },
+    "ServiceType": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ServiceType",
+      "type": "object",
+      "description": "Defines the different types of services offered by the business.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ServiceType entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the service type (e.g., 'Montagem de Móveis', 'Instalação de Ar-condicionado')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the service type."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the service type was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the service type was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "createdAt"
+      ]
+    },
+    "Service": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Service",
+      "type": "object",
+      "description": "Represents a single service instance performed for a client, including its details and status.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Service entity."
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Reference to the Client for whom the service was performed. (Relationship: Client 1:N Service)"
+        },
+        "serviceTypeId": {
+          "type": "string",
+          "description": "Reference to the ServiceType that describes this service. (Relationship: ServiceType 1:N Service)"
+        },
+        "scheduledDate": {
+          "type": "string",
+          "description": "The date and time when the service is scheduled to occur.",
+          "format": "date-time"
+        },
+        "completedDate": {
+          "type": "string",
+          "description": "The date and time when the service was completed.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the service (e.g., 'Orçamento', 'Em andamento', 'Concluído', 'Cancelado')."
+        },
+        "chargedValue": {
+          "type": "number",
+          "description": "The monetary value charged for this service."
+        },
+        "materialsUsedIds": {
+          "type": "array",
+          "description": "References to Products (materials) used in this service. (Relationship: Product N:N Service)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "detailedDescription": {
+          "type": "string",
+          "description": "A detailed description of the work performed for the service."
+        },
+        "attachedPhotoUris": {
+          "type": "array",
+          "description": "URIs of photos attached to document the service (e.g., before/after pictures).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "observations": {
+          "type": "string",
+          "description": "General observations or notes related to the service."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the service record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the service record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "clientId",
+        "serviceTypeId",
+        "status",
+        "chargedValue",
+        "createdAt"
+      ]
+    },
+    "MaterialCategory": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MaterialCategory",
+      "type": "object",
+      "description": "Categorizes materials used in stock for better organization and management.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MaterialCategory entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the material category (e.g., 'Elétrica', 'Parafusos e Fixadores')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the material category."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the material category was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the material category was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "createdAt"
+      ]
+    },
+    "Product": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Product",
+      "type": "object",
+      "description": "Represents an individual item or material held in inventory.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Product entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the material or product."
+        },
+        "materialCategoryId": {
+          "type": "string",
+          "description": "Reference to the MaterialCategory this product belongs to. (Relationship: MaterialCategory 1:N Product)"
+        },
+        "internalCode": {
+          "type": "string",
+          "description": "An internal code or SKU for the product, for inventory tracking."
+        },
+        "currentQuantity": {
+          "type": "number",
+          "description": "The current quantity of the product in stock."
+        },
+        "minimumQuantity": {
+          "type": "number",
+          "description": "The minimum quantity threshold for this product, triggering low stock alerts."
+        },
+        "unitCost": {
+          "type": "number",
+          "description": "The cost of a single unit of the product."
+        },
+        "supplierId": {
+          "type": "string",
+          "description": "Reference to the Supplier from whom this product is typically acquired. (Relationship: Supplier 1:N Product)"
+        },
+        "entryDate": {
+          "type": "string",
+          "description": "The date when this product was first entered into stock.",
+          "format": "date-time"
+        },
+        "storageLocation": {
+          "type": "string",
+          "description": "The physical location where the product is stored (e.g., 'Prateleira A', 'Armário 3')."
+        },
+        "observations": {
+          "type": "string",
+          "description": "General observations or notes about the product."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the product record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the product record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "materialCategoryId",
+        "currentQuantity",
+        "minimumQuantity",
+        "unitCost",
+        "supplierId",
+        "createdAt"
+      ]
+    },
+    "FinancialEntry": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FinancialEntry",
+      "type": "object",
+      "description": "Records all incoming financial transactions or revenues.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FinancialEntry entity."
+        },
+        "date": {
+          "type": "string",
+          "description": "The date when the financial entry occurred.",
+          "format": "date-time"
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Reference to the Client associated with this revenue, if applicable. (Relationship: Client 1:N FinancialEntry)"
+        },
+        "serviceTypeId": {
+          "type": "string",
+          "description": "Reference to the ServiceType that generated this revenue, if applicable. (Relationship: ServiceType 1:N FinancialEntry)"
+        },
+        "value": {
+          "type": "number",
+          "description": "The monetary value of the financial entry."
+        },
+        "paymentMethodId": {
+          "type": "string",
+          "description": "Reference to the PaymentMethod used for this entry. (Relationship: PaymentMethod 1:N FinancialEntry)"
+        },
+        "status": {
+          "type": "string",
+          "description": "The payment status of the entry (e.g., 'Pago', 'Pendente')."
+        },
+        "observations": {
+          "type": "string",
+          "description": "General observations or notes about the financial entry."
+        },
+        "serviceId": {
+          "type": "string",
+          "description": "Optional reference to the Service that generated this financial entry. (Relationship: Service 1:N FinancialEntry)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the financial entry record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the financial entry record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "value",
+        "paymentMethodId",
+        "status",
+        "createdAt"
+      ]
+    },
+    "ExpenseCategory": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ExpenseCategory",
+      "type": "object",
+      "description": "Defines categories for financial expenditures to enable detailed expense tracking.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ExpenseCategory entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the expense category (e.g., 'Material', 'Combustível', 'Ferramenta', 'Marketing', 'Outros')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of what the expense category includes."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the expense category was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the expense category was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "createdAt"
+      ]
+    },
+    "FinancialExit": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FinancialExit",
+      "type": "object",
+      "description": "Records all outgoing financial transactions or expenses.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FinancialExit entity."
+        },
+        "date": {
+          "type": "string",
+          "description": "The date when the financial exit occurred.",
+          "format": "date-time"
+        },
+        "expenseCategoryId": {
+          "type": "string",
+          "description": "Reference to the ExpenseCategory this financial exit belongs to. (Relationship: ExpenseCategory 1:N FinancialExit)"
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the expense."
+        },
+        "value": {
+          "type": "number",
+          "description": "The monetary value of the financial exit."
+        },
+        "paymentMethodId": {
+          "type": "string",
+          "description": "Reference to the PaymentMethod used for this exit. (Relationship: PaymentMethod 1:N FinancialExit)"
+        },
+        "supplierId": {
+          "type": "string",
+          "description": "Optional reference to the Supplier associated with this expense. (Relationship: Supplier 1:N FinancialExit)"
+        },
+        "observations": {
+          "type": "string",
+          "description": "General observations or notes about the financial exit."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the financial exit record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the financial exit record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "expenseCategoryId",
+        "value",
+        "paymentMethodId",
+        "createdAt"
+      ]
+    },
+    "StockMovement": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "StockMovement",
+      "type": "object",
+      "description": "Logs all movements of products in and out of stock, including adjustments.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the StockMovement entity."
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to the Product that was moved. (Relationship: Product 1:N StockMovement)"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of movement (e.g., 'entrada' for incoming, 'saida' for outgoing, 'ajuste' for inventory correction)."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The quantity of the product moved. Positive for incoming, negative for outgoing."
+        },
+        "movementDate": {
+          "type": "string",
+          "description": "The date and time when the stock movement occurred.",
+          "format": "date-time"
+        },
+        "reason": {
+          "type": "string",
+          "description": "The reason for the stock movement (e.g., 'compra', 'venda', 'uso em serviço', 'inventário')."
+        },
+        "serviceId": {
+          "type": "string",
+          "description": "Optional reference to a Service if the movement is related to materials used in a service. (Relationship: Service 1:N StockMovement)"
+        },
+        "observations": {
+          "type": "string",
+          "description": "General observations or notes about the stock movement."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the stock movement record was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "productId",
+        "type",
+        "quantity",
+        "movementDate",
+        "reason",
+        "createdAt"
+      ]
+    },
+    "PaymentMethod": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PaymentMethod",
+      "type": "object",
+      "description": "Defines the various methods of payment accepted or used for transactions.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PaymentMethod entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the payment method (e.g., 'Dinheiro', 'Cartão de Crédito', 'Pix', 'Transferência Bancária')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the payment method."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the payment method was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the payment method was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/usuarios/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores profile information for users, primarily the administrator.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The Firebase Authentication UID of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/clientes/{clientId}",
+        "definition": {
+          "entityName": "Client",
+          "schema": {
+            "$ref": "#/backend/entities/Client"
+          },
+          "description": "Manages customer data.",
+          "params": [
+            {
+              "name": "clientId",
+              "description": "Unique identifier for the client."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/notas_fiscais/{invoiceId}",
+        "definition": {
+          "entityName": "Invoice",
+          "schema": {
+            "$ref": "#/backend/entities/Invoice"
+          },
+          "description": "Stores generated invoices and receipts.",
+          "params": [
+            {
+              "name": "invoiceId",
+              "description": "Unique identifier for the invoice."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/fornecedores/{supplierId}",
+        "definition": {
+          "entityName": "Supplier",
+          "schema": {
+            "$ref": "#/backend/entities/Supplier"
+          },
+          "description": "Stores details about suppliers.",
+          "params": [
+            {
+              "name": "supplierId",
+              "description": "Unique identifier for the supplier."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/service_types/{serviceTypeId}",
+        "definition": {
+          "entityName": "ServiceType",
+          "schema": {
+            "$ref": "#/backend/entities/ServiceType"
+          },
+          "description": "Defines the various types of services offered.",
+          "params": [
+            {
+              "name": "serviceTypeId",
+              "description": "Unique identifier for the service type."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/material_categories/{materialCategoryId}",
+        "definition": {
+          "entityName": "MaterialCategory",
+          "schema": {
+            "$ref": "#/backend/entities/MaterialCategory"
+          },
+          "description": "Categorizes materials.",
+          "params": [
+            {
+              "name": "materialCategoryId",
+              "description": "Unique identifier for the material category."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/expense_categories/{expenseCategoryId}",
+        "definition": {
+          "entityName": "ExpenseCategory",
+          "schema": {
+            "$ref": "#/backend/entities/ExpenseCategory"
+          },
+          "description": "Defines categories for financial expenditures.",
+          "params": [
+            {
+              "name": "expenseCategoryId",
+              "description": "Unique identifier for the expense category."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/servicos/{serviceId}",
+        "definition": {
+          "entityName": "Service",
+          "schema": {
+            "$ref": "#/backend/entities/Service"
+          },
+          "description": "Represents a single service instance.",
+          "params": [
+            {
+              "name": "serviceId",
+              "description": "Unique identifier for the service."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/estoque/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": {
+            "$ref": "#/backend/entities/Product"
+          },
+          "description": "Represents an individual item in inventory.",
+          "params": [
+            {
+              "name": "productId",
+              "description": "Unique identifier for the product."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/financeiro_entradas/{financialEntryId}",
+        "definition": {
+          "entityName": "FinancialEntry",
+          "schema": {
+            "$ref": "#/backend/entities/FinancialEntry"
+          },
+          "description": "Records all incoming financial transactions.",
+          "params": [
+            {
+              "name": "financialEntryId",
+              "description": "Unique identifier for the entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/financeiro_saidas/{financialExitId}",
+        "definition": {
+          "entityName": "FinancialExit",
+          "schema": {
+            "$ref": "#/backend/entities/FinancialExit"
+          },
+          "description": "Records all outgoing financial transactions.",
+          "params": [
+            {
+              "name": "financialExitId",
+              "description": "Unique identifier for the exit."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/movimentacoes_estoque/{stockMovementId}",
+        "definition": {
+          "entityName": "StockMovement",
+          "schema": {
+            "$ref": "#/backend/entities/StockMovement"
+          },
+          "description": "Logs all movements of products.",
+          "params": [
+            {
+              "name": "stockMovementId",
+              "description": "Unique identifier for the movement."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/payment_methods/{paymentMethodId}",
+        "definition": {
+          "entityName": "PaymentMethod",
+          "schema": {
+            "$ref": "#/backend/entities/PaymentMethod"
+          },
+          "description": "Defines various methods of payment.",
+          "params": [
+            {
+              "name": "paymentMethodId",
+              "description": "Unique identifier for the payment method."
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

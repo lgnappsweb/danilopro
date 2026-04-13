@@ -1,0 +1,32 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * GESTÃO PRO SERVIÇO - REGRAS PROFISSIONAIS
+     * Permitir acesso completo ao administrador autenticado.
+     */
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Permitir todas as operações para usuários autenticados (Admin único)
+    match /{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    // Regra específica para o perfil do usuário
+    // Permitimos leitura (read) pública de todos os perfis para que a logo e nome do app apareçam na tela de login
+    match /usuarios/{userId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Permitir listagem pública da coleção de usuários para encontrar o perfil administrativo (branding)
+    match /usuarios {
+      allow list: if true;
+    }
+  }
+}

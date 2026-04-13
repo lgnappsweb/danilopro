@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* MODO CLARO (Default) */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+    --chart-1: 221.2 83.2% 53.3%;
+    --chart-2: 200 60% 50%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    /* MODO ESCURO */
+    --background: 221 14% 10%;
+    --foreground: 210 20% 98%;
+    --card: 221 14% 12%;
+    --card-foreground: 210 20% 98%;
+    --popover: 221 14% 12%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 200 60% 50%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 221 14% 20%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 200 60% 50%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 221 14% 20%;
+    --input: 221 14% 20%;
+    --ring: 221.2 83.2% 53.3%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    overflow-x: hidden;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    overflow-x: hidden;
+  }
+}
+
+@media print {
+  @page {
+    margin: 1cm;
+    size: auto;
+  }
+  
+  body {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  [role="dialog"] {
+    position: static !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  #printable-invoice {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
