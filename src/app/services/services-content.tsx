@@ -701,7 +701,7 @@ _Gerado por ${appName}_`
               const formattedDate = service.scheduledDate ? format(new Date(service.scheduledDate), "dd/MM/yy HH:mm", { locale: ptBR }) : "—"
 
               return (
-                <Link key={service.id} href={`/services?serviceId=${service.id}`}>
+                <div key={service.id} className="cursor-pointer" onClick={() => setViewingService(service)}>
                   <Card className="group hover:border-orange-500 transition-all duration-500 shadow-sm hover:shadow-2xl bg-card border-2 rounded-[2.5rem] p-0 overflow-hidden">
                     <div className="flex flex-col lg:flex-row lg:items-center">
                       <div className="p-8 lg:w-1/3 flex items-start justify-between border-b lg:border-b-0 lg:border-r border-primary/10">
@@ -759,6 +759,7 @@ _Gerado por ${appName}_`
                               className="h-12 w-12 rounded-2xl bg-muted/50 hover:bg-primary hover:text-white transition-all"
                               onClick={(e) => {
                                 e.stopPropagation()
+                                e.preventDefault()
                                 handleEdit(service)
                               }}
                             >
@@ -770,6 +771,7 @@ _Gerado por ${appName}_`
                               className="h-12 w-12 rounded-2xl bg-muted/50 hover:bg-destructive hover:text-white transition-all"
                               onClick={(e) => {
                                 e.stopPropagation()
+                                e.preventDefault()
                                 setServiceToDelete(service.id)
                               }}
                             >
@@ -780,7 +782,7 @@ _Gerado por ${appName}_`
                       </div>
                     </div>
                   </Card>
-                </Link>
+                </div>
               )
             })}
           </div>
@@ -816,7 +818,6 @@ _Gerado por ${appName}_`
         <Dialog open={!!viewingService} onOpenChange={(open) => {
           if (!open) {
             setViewingService(null)
-            router.push("/services")
           }
         }}>
           <DialogContent className="sm:max-w-[700px] rounded-[3rem] p-0 border-0 shadow-2xl overflow-hidden">
@@ -833,7 +834,6 @@ _Gerado por ${appName}_`
                         <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs mt-1">Ordem de Serviço #{viewingService.id.slice(-6).toUpperCase()}</p>
                       </div>
                     </div>
-                    <Button onClick={() => setViewingService(null)} variant="ghost" size="icon" className="rounded-full hover:bg-orange-500/20"><X className="w-6 h-6" /></Button>
                   </div>
                   <div className="flex flex-wrap gap-3">
                     {getStatusBadge(viewingService.status)}

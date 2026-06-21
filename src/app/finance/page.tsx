@@ -56,6 +56,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { useCollection, useFirestore, useMemoFirebase, useUser, addDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase"
 import { collection, query, orderBy, doc } from "firebase/firestore"
 import { useForm } from "react-hook-form"
@@ -270,10 +280,19 @@ export default function FinancePage() {
     form.reset()
   }
 
+  const [entryToDelete, setEntryToDelete] = useState<{id: string, type: "revenue" | "expense"} | null>(null)
+
+  const handleConfirmDelete = () => {
+    if (entryToDelete) {
+      const collectionName = entryToDelete.type === "revenue" ? "financeiro_entradas" : "financeiro_saidas"
+      const docRef = doc(db, collectionName, entryToDelete.id)
+      deleteDocumentNonBlocking(docRef)
+      setEntryToDelete(null)
+    }
+  }
+
   const handleDelete = (id: string, type: "revenue" | "expense") => {
-    const collectionName = type === "revenue" ? "financeiro_entradas" : "financeiro_saidas"
-    const docRef = doc(db, collectionName, id)
-    deleteDocumentNonBlocking(docRef)
+    setEntryToDelete({ id, type })
   }
 
   const isLoading = loadingRev || loadingExp
@@ -1016,6 +1035,32 @@ export default function FinancePage() {
             </div>
           </TabsContent>
         </Tabs>
+        <AlertDialog open={!!entryToDelete} onOpenChange={() => setEntryToDelete(null)}>
+          <AlertDialogContent className="rounded-[3rem] p-10 border-0 shadow-2xl">
+            <AlertDialogHeader className="text-center space-y-6">
+              <div className="bg-destructive/10 w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto shadow-inner animate-pulse">
+                <Trash2 className="w-12 h-12 text-destructive" />
+              </div>
+              <div className="space-y-2">
+                <AlertDialogTitle className="text-3xl font-black text-center w-full">Excluir Lançamento?</AlertDialogTitle>
+                <AlertDialogDescription className="text-lg font-medium text-center">
+                  Esta ação não pode ser desfeita.
+                </AlertDialogDescription>
+              </div>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex flex-col gap-4 pt-8 w-full">
+              <AlertDialogAction 
+                onClick={handleConfirmDelete} 
+                className="w-full h-20 text-xl font-black rounded-[1.5rem] bg-destructive text-white hover:bg-destructive/90 shadow-xl shadow-destructive/20 order-1 sm:order-2"
+              >
+                Confirmar Exclusão
+              </AlertDialogAction>
+              <AlertDialogCancel className="w-full h-20 text-xl font-black rounded-[1.5rem] order-2 sm:order-1 border-2 transition-all hover:bg-muted">
+                Voltar
+              </AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </DashboardLayout>
   )
