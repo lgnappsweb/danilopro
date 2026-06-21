@@ -26,6 +26,7 @@ import {
   Settings
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
   Bar,
   BarChart,
@@ -253,6 +254,14 @@ export default function DashboardPage() {
         </div>
 
         <div className="space-y-8 px-4">
+          <div className="flex justify-center mb-12">
+            <Link href="/finance">
+              <Button size="lg" className="h-16 px-10 rounded-[2rem] font-black text-lg bg-primary shadow-xl shadow-primary/20 hover:scale-105 transition-all">
+                Ver Todas as Movimentações
+              </Button>
+            </Link>
+          </div>
+
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <Link href="/finance" className="block transition-transform hover:scale-[1.03] active:scale-[0.97]">
               <Card className="bg-card/50 border-2 border-primary/10 hover:bg-primary/5 transition-colors cursor-pointer h-full rounded-[2rem] p-2">

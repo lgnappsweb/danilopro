@@ -26,7 +26,8 @@ import {
   User,
   Truck,
   CreditCard,
-  Tag
+  Tag,
+  FileText
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -64,6 +65,7 @@ import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 const entrySchema = z.object({
   type: z.enum(["revenue", "expense"]),
@@ -96,8 +98,11 @@ const parseCurrencyToNumber = (value: string) => {
 export default function FinancePage() {
   const db = useFirestore()
   const { user } = useUser()
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [activeTab, setActiveTab] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
+  const [isExporting, setIsExporting] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false)
   const [isSupplierDialogOpen, setIsSupplierDialogOpen] = useState(false)
@@ -158,15 +163,88 @@ export default function FinancePage() {
     return combined
   }, [revenues, expenses, activeTab, searchTerm])
 
+  const filteredEntries = useMemo(() => {
+    let combined = allEntries.filter(e => {
+      const entryDate = new Date(e.date);
+      return (
+        entryDate.getMonth() + 1 === selectedMonth &&
+        entryDate.getFullYear() === selectedYear
+      );
+    });
+    return combined;
+  }, [allEntries, selectedMonth, selectedYear]);
+
   const totals = useMemo(() => {
-    const totalRevenue = (revenues || []).reduce((acc, curr) => acc + (Number(curr.value) || 0), 0)
-    const totalExpense = (expenses || []).reduce((acc, curr) => acc + (Number(curr.value) || 0), 0)
+    const totalRevenue = (filteredEntries || []).filter(e => e.type === "revenue").reduce((acc, curr) => acc + (Number(curr.value) || 0), 0)
+    const totalExpense = (filteredEntries || []).filter(e => e.type === "expense").reduce((acc, curr) => acc + (Number(curr.value) || 0), 0)
     return {
       revenue: totalRevenue,
       expense: totalExpense,
       balance: totalRevenue - totalExpense
     }
-  }, [revenues, expenses])
+  }, [filteredEntries])
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    const { jsPDF } = await import("jspdf");
+    const autoTable = (await import("jspdf-autotable")).default;
+
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFillColor(249, 115, 22); // Orange-500
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(26);
+    doc.setFont("helvetica", "bold");
+    doc.text("DANILOPRO", 14, 18);
+    
+    // Sub-header (Business Info)
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.text(`FINANCEIRO - ${selectedMonth}/${selectedYear}`, 14, 28);
+    doc.setFontSize(10);
+    doc.text("Danilo Montagens - Instalações & Montagens", 14, 35);
+
+    // Filtered data in table
+    const tableData = filteredEntries.map(e => [
+      e.date,
+      e.description,
+      e.type === "revenue" ? "Receita" : "Despesa",
+      `R$ ${Number(e.value).toFixed(2).replace('.', ',')}`
+    ]);
+
+    autoTable(doc, {
+      startY: 45,
+      head: [['Data', 'Descrição', 'Tipo', 'Valor']],
+      body: tableData,
+      headStyles: { fillColor: [249, 115, 22] },
+    });
+    
+    // Totals
+    const finalY = (doc as any).lastAutoTable.finalY + 10;
+    doc.setFontSize(12);
+    doc.text(`Total Receitas: R$ ${totals.revenue.toFixed(2).replace('.', ',')}`, 14, finalY);
+    doc.text(`Total Despesas: R$ ${totals.expense.toFixed(2).replace('.', ',')}`, 14, finalY + 7);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Saldo Final: R$ ${totals.balance.toFixed(2).replace('.', ',')}`, 14, finalY + 14);
+
+    doc.save(`financeiro_${selectedMonth}_${selectedYear}.pdf`);
+    setIsExporting(false);
+  }
+
+  const handleExportWhatsApp = () => {
+    let message = `*DANILOPRO - Relatório Financeiro ${selectedMonth}/${selectedYear}*\n\n`;
+    filteredEntries.forEach(e => {
+        message += `${e.date} - ${e.description} - R$ ${Number(e.value).toFixed(2).replace('.', ',')}\n`;
+    });
+    message += `\n*TOTAL RECEITA:* R$ ${totals.revenue.toFixed(2).replace('.', ',')}`;
+    message += `\n*TOTAL DESPESA:* R$ ${totals.expense.toFixed(2).replace('.', ',')}`;
+    message += `\n*SALDO:* R$ ${totals.balance.toFixed(2).replace('.', ',')}`;
+    message += `\n\n_Gerado por DaniloPro_`;
+    
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+  }
 
   const onSubmit = (values: EntryFormValues) => {
     const collectionName = values.type === "revenue" ? "financeiro_entradas" : "financeiro_saidas"
@@ -716,6 +794,36 @@ export default function FinancePage() {
               R$ {totals.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
           </Card>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4 py-4 px-2 mb-6">
+          <Badge variant="outline" className="px-4 py-2 border-emerald-500/30 text-emerald-500 font-black uppercase tracking-widest text-xs bg-emerald-500/5">
+            Ações de Relatório
+          </Badge>
+          <Button onClick={handleExportPDF} disabled={isExporting} className="gap-2 h-12 px-6 rounded-2xl font-black uppercase tracking-widest">
+            <FileText className="w-4 h-4" /> Exportar PDF
+          </Button>
+          <Button onClick={handleExportWhatsApp} variant="secondary" className="gap-2 h-12 px-6 rounded-2xl font-black uppercase tracking-widest">
+            WhatsApp
+          </Button>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4 py-4 px-2 bg-muted/20 rounded-2xl mb-6">
+          <div className="flex items-center gap-2">
+            <Label className="font-bold">Mês</Label>
+            <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(Number(v))}>
+              <SelectTrigger className="w-[120px] rounded-xl"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                  <SelectItem key={m} value={m.toString()}>{m.toString().padStart(2, '0')}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="font-bold">Ano</Label>
+            <Input type="number" value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))} className="w-[100px] rounded-xl" />
+          </div>
         </div>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full px-2 sm:px-0">

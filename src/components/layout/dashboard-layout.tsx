@@ -236,7 +236,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen w-full bg-background pb-24 md:pb-0 overflow-x-hidden">
         <AppSidebar />
         <SidebarInset className="flex-1 relative min-w-0">
-          <FixedHeader />
           <main className={cn(
             "p-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full overflow-x-hidden",
             pathname === "/dashboard" ? "pt-12 md:pt-20" : "pt-28 md:pt-32"
@@ -245,6 +244,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </main>
         </SidebarInset>
       </div>
+      <FixedHeader />
       <MobileBottomNav profile={profile} />
     </SidebarProvider>
   )
