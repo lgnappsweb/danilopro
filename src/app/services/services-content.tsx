@@ -10,7 +10,8 @@ import { Plus, Search, Calendar, User, Settings2, CheckCircle, Clock, XCircle, L
 import { Input } from "@/components/ui/input"
 import { 
   Dialog, 
-  DialogContent, 
+  DialogContent,
+  DialogContentSimple,
   DialogDescription, 
   DialogHeader, 
   DialogTitle, 
@@ -44,7 +45,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useCollection, useDoc, useFirestore, useMemoFirebase, useUser, addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase"
-import { collection, query, orderBy, doc, increment, updateDoc } from "firebase/firestore"
+import { collection, query, orderBy, doc, increment, updateDoc, getDoc } from "firebase/firestore"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -227,9 +228,13 @@ export default function ServicesContent() {
       const service = services?.find(s => s.id === serviceToDelete)
       if (service && service.materials && service.materials.length > 0) {
         for (const m of service.materials) {
-          await updateDoc(doc(db, "estoque", m.productId), {
-            currentQuantity: increment(m.quantity)
-          }).catch(err => console.error(`Erro ao retornar estoque para ${m.productId}:`, err))
+          const productRef = doc(db, "estoque", m.productId)
+          const productSnap = await getDoc(productRef)
+          if (productSnap.exists()) {
+            await updateDoc(productRef, {
+              currentQuantity: increment(m.quantity)
+            }).catch(err => console.error(`Erro ao retornar estoque para ${m.productId}:`, err))
+          }
         }
       }
       deleteDocumentNonBlocking(doc(db, "servicos", serviceToDelete))
@@ -820,9 +825,9 @@ _Gerado por ${appName}_`
             setViewingService(null)
           }
         }}>
-          <DialogContent className="sm:max-w-[700px] rounded-[3rem] p-0 border-0 shadow-2xl overflow-hidden">
+          <DialogContentSimple className="sm:max-w-[700px] w-[95vw] max-h-[90vh] rounded-[3rem] p-0 border-0 shadow-2xl overflow-y-auto">
             {viewingService && (
-              <div className="flex flex-col h-full max-h-[90vh]">
+              <div className="flex flex-col">
                 <div className="p-8 bg-orange-500/10 border-b border-orange-500/10">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-4">
@@ -844,7 +849,7 @@ _Gerado por ${appName}_`
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-2 space-y-2">
+                <div className="p-2 space-y-2">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <div className="space-y-1">
                       <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-1">
@@ -926,7 +931,7 @@ _Gerado por ${appName}_`
                 </div>
               </div>
             )}
-          </DialogContent>
+          </DialogContentSimple>
         </Dialog>
       </div>
     </DashboardLayout>

@@ -111,6 +111,7 @@ export default function FinancePage() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [activeTab, setActiveTab] = useState("all")
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [isExporting, setIsExporting] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -125,6 +126,7 @@ export default function FinancePage() {
   const expenseCatsQuery = useMemoFirebase(() => user ? query(collection(db, "expense_categories"), orderBy("name", "asc")) : null, [db, user])
   const paymentMethodsQuery = useMemoFirebase(() => user ? query(collection(db, "payment_methods"), orderBy("name", "asc")) : null, [db, user])
   const serviceTypesQuery = useMemoFirebase(() => user ? query(collection(db, "service_types"), orderBy("name", "asc")) : null, [db, user])
+  const servicesQuery = useMemoFirebase(() => user ? query(collection(db, "servicos"), orderBy("scheduledDate", "desc")) : null, [db, user])
   const clientsQuery = useMemoFirebase(() => user ? query(collection(db, "clientes"), orderBy("name", "asc")) : null, [db, user])
   const suppliersQuery = useMemoFirebase(() => user ? query(collection(db, "fornecedores"), orderBy("name", "asc")) : null, [db, user])
 
@@ -134,6 +136,7 @@ export default function FinancePage() {
   const { data: paymentMethods } = useCollection(paymentMethodsQuery)
   const { data: serviceTypes } = useCollection(serviceTypesQuery)
   const { data: clients } = useCollection(clientsQuery)
+  const { data: services } = useCollection(servicesQuery)
   const { data: suppliers } = useCollection(suppliersQuery)
 
   const form = useForm<EntryFormValues>({
@@ -184,6 +187,20 @@ export default function FinancePage() {
     return combined;
   }, [allEntries, selectedMonth, selectedYear]);
 
+  const filteredServices = useMemo(() => {
+    if (!services) return [];
+    return services.filter(s => {
+      if (!s.scheduledDate) return false;
+      const d = new Date(s.scheduledDate);
+      const matchesDay = selectedDay ? d.getDate() === selectedDay : true;
+      return (
+        d.getMonth() + 1 === selectedMonth &&
+        d.getFullYear() === selectedYear &&
+        matchesDay
+      );
+    });
+  }, [services, selectedDay, selectedMonth, selectedYear]);
+
   const totals = useMemo(() => {
     const totalRevenue = (filteredEntries || []).filter(e => e.type === "revenue").reduce((acc, curr) => acc + (Number(curr.value) || 0), 0)
     const totalExpense = (filteredEntries || []).filter(e => e.type === "expense").reduce((acc, curr) => acc + (Number(curr.value) || 0), 0)
@@ -216,8 +233,8 @@ export default function FinancePage() {
     doc.setFontSize(10);
     doc.text("Danilo Montagens - Instalações & Montagens", 14, 35);
 
-    // Filtered data in table
-    const tableData = filteredEntries.map(e => [
+    // Filtered data in table (Entries)
+    const tableDataEntries = filteredEntries.map(e => [
       e.date,
       e.description,
       e.type === "revenue" ? "Receita" : "Despesa",
@@ -227,10 +244,23 @@ export default function FinancePage() {
     autoTable(doc, {
       startY: 45,
       head: [['Data', 'Descrição', 'Tipo', 'Valor']],
-      body: tableData,
+      body: tableDataEntries,
       headStyles: { fillColor: [249, 115, 22] },
     });
     
+    // Filtered data in table (Services)
+    const tableDataServices = filteredServices.map(s => [
+      s.scheduledDate,
+      clients?.find(c => c.id === s.clientId)?.name || "N/A",
+      `R$ ${Number(s.chargedValue).toFixed(2).replace('.', ',')}`
+    ]);
+
+    autoTable(doc, {
+        head: [['Data', 'Cliente', 'Valor OS']],
+        body: tableDataServices,
+        headStyles: { fillColor: [249, 115, 22] },
+      });
+
     // Totals
     const finalY = (doc as any).lastAutoTable.finalY + 10;
     doc.setFontSize(12);
@@ -245,12 +275,17 @@ export default function FinancePage() {
 
   const handleExportWhatsApp = () => {
     let message = `*DANILOPRO - Relatório Financeiro ${selectedMonth}/${selectedYear}*\n\n`;
+    message += "*Financeiro:*\n";
     filteredEntries.forEach(e => {
         message += `${e.date} - ${e.description} - R$ ${Number(e.value).toFixed(2).replace('.', ',')}\n`;
     });
     message += `\n*TOTAL RECEITA:* R$ ${totals.revenue.toFixed(2).replace('.', ',')}`;
     message += `\n*TOTAL DESPESA:* R$ ${totals.expense.toFixed(2).replace('.', ',')}`;
     message += `\n*SALDO:* R$ ${totals.balance.toFixed(2).replace('.', ',')}`;
+    
+    message += `\n\n*Ordens de Serviço:*\n`;
+    filteredServices.forEach(s => message += `${s.scheduledDate} - ${clients?.find(c => c.id === s.clientId)?.name || "N/A"} - R$ ${Number(s.chargedValue).toFixed(2).replace('.', ',')}\n`);
+    
     message += `\n\n_Gerado por DaniloPro_`;
     
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
@@ -795,7 +830,7 @@ export default function FinancePage() {
           </Dialog>
         </div>
 
-        <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-3 px-2 sm:px-0">
+        <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-4 px-2 sm:px-0">
           <Card className="bg-emerald-500/5 border-emerald-500/20 p-6 md:p-8 rounded-[2.5rem] relative overflow-hidden group transition-all hover:scale-[1.02]">
             <TrendingUp className="absolute -right-4 -bottom-4 w-32 h-32 opacity-5 text-emerald-500 transition-transform group-hover:scale-110" />
             <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em] mb-2">Total de Receitas</p>
@@ -813,21 +848,20 @@ export default function FinancePage() {
               R$ {totals.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
           </Card>
+          <Card className="bg-primary/5 border-primary/20 p-6 md:p-8 rounded-[2.5rem] relative overflow-hidden group transition-all hover:scale-[1.02]">
+            <FileText className="absolute -right-4 -bottom-4 w-32 h-32 opacity-5 text-primary transition-transform group-hover:scale-110" />
+            <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2">Ordens de Serviço</p>
+            <div className="text-2xl md:text-4xl font-black break-words">
+              R$ {filteredServices.reduce((acc, curr) => acc + (Number(curr.chargedValue) || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </div>
+          </Card>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 py-4 px-2 mb-6">
-          <Badge variant="outline" className="px-4 py-2 border-emerald-500/30 text-emerald-500 font-black uppercase tracking-widest text-xs bg-emerald-500/5">
-            Ações de Relatório
-          </Badge>
-          <Button onClick={handleExportPDF} disabled={isExporting} className="gap-2 h-12 px-6 rounded-2xl font-black uppercase tracking-widest">
-            <FileText className="w-4 h-4" /> Exportar PDF
-          </Button>
-          <Button onClick={handleExportWhatsApp} variant="secondary" className="gap-2 h-12 px-6 rounded-2xl font-black uppercase tracking-widest">
-            WhatsApp
-          </Button>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-4 py-4 px-2 bg-muted/20 rounded-2xl mb-6">
+        <div className="flex flex-wrap items-center justify-center gap-4 py-4 px-2 bg-muted/20 rounded-2xl mb-6">
+          <div className="flex items-center gap-2">
+            <Label className="font-bold">Dia</Label>
+            <Input type="number" placeholder="DD" value={selectedDay || ""} onChange={(e) => setSelectedDay(Number(e.target.value) || null)} className="w-[80px] rounded-xl" />
+          </div>
           <div className="flex items-center gap-2">
             <Label className="font-bold">Mês</Label>
             <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(Number(v))}>
@@ -844,6 +878,20 @@ export default function FinancePage() {
             <Input type="number" value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))} className="w-[100px] rounded-xl" />
           </div>
         </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-4 py-4 px-2 mb-6">
+          <Badge variant="outline" className="px-4 py-2 border-emerald-500/30 text-emerald-500 font-black uppercase tracking-widest text-xs bg-emerald-500/5">
+            Ações de Relatório
+          </Badge>
+          <Button onClick={handleExportPDF} disabled={isExporting} className="gap-2 h-12 px-6 rounded-2xl font-black uppercase tracking-widest">
+            <FileText className="w-4 h-4" /> Exportar PDF
+          </Button>
+          <Button onClick={handleExportWhatsApp} variant="secondary" className="gap-2 h-12 px-6 rounded-2xl font-black uppercase tracking-widest">
+            WhatsApp
+          </Button>
+        </div>
+
+
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full px-2 sm:px-0">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
